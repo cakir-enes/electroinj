@@ -11,6 +11,8 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "@blueprintjs/core": "^3.18.0",
+    "@zeit/next-css": "^1.0.1",
     "electron-serve": "^0.3.0",
     "electron-store": "^4.0.0"
   },
