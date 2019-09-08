@@ -1,10 +1,12 @@
 import '@blueprintjs/core/lib/css/blueprint.css';
-import React, { useState, useEffect } from 'react';
-import Head from 'next/head';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Virtuoso } from 'react-virtuoso';
 import Link from 'next/link';
 import { UL, H3, Overlay, Classes } from '@blueprintjs/core';
 import { useHover } from '../hooks/useHover';
 import { ipcRenderer } from 'electron';
+import { Sidebar } from '../components/sidebar';
+import Page from '../layouts/';
 
 type Param = { name: string; val: string };
 
@@ -30,25 +32,24 @@ const useParameters = () => {
 };
 const Home = () => {
 	const p = useParameters();
-	return (
-		<div style={{ display: 'flex' }}>
-			<div style={{ width: '80px', backgroundColor: '#00e1e1' }} />
+	const [ activeIdx, setActive ] = useState(2);
 
-			<UL style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-				{p.map((i) => <Item name={i.name} val={i.val} />)}
-			</UL>
-			{/* <p>
-						⚡ Electron + Next.js ⚡ -
-						<Link href="/next">
-							<a>Go to next page</a>
-						</Link>
-					</p>
-					<img src="/static/logo.png" /> */}
-		</div>
+	return (
+		<Page>
+			<Virtuoso
+				// style={{ width: '100vh', height: '600px' }}
+				totalCount={p.length}
+				item={(index) => <Item name={p[index].name} val={p[index].val} isSelected={index === activeIdx} />}
+			/>
+			{/* <UL style={{ flexGrow: 1 }}>
+				{p.map((i, idx) => <Item name={i.name} val={i.val} isSelected={idx === activeIdx} />)}
+			</UL> */}
+		</Page>
 	);
 };
 
-const Item: React.FC<Param> = ({ name, val }) => {
+type Props = Param & { isSelected: boolean };
+const Item: React.FC<Props> = ({ name, val, isSelected }) => {
 	const [ ref, isHovered ]: any = useHover();
 
 	return (
@@ -58,7 +59,7 @@ const Item: React.FC<Param> = ({ name, val }) => {
 			style={{
 				display: 'flex',
 				justifyContent: 'space-between',
-				backgroundColor: `${isHovered ? '#00e3e3' : 'gray'}`
+				backgroundColor: `${isSelected ? '#00e3e3' : 'gray'}`
 			}}
 		>
 			<H3>{name}</H3>

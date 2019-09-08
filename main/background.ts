@@ -30,7 +30,7 @@ if (isProd) {
 
 	let arr = Array.from({ length: 150 }).map((_, i) => ({ name: 'aa' + i, val: 'sdf' }));
 	ipcMain.on('update', (event, arg) => {
-		event.reply('update', arr.map((i) => ({ ...i, val: Math.random().toFixed(0) })));
+		event.reply('update', arr.map((i) => ({ ...i, val: Math.random().toFixed(3) })));
 	});
 })();
 
