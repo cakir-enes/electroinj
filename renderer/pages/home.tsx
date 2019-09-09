@@ -1,15 +1,14 @@
 import '@blueprintjs/core/lib/css/blueprint.css';
 import React, { useState, useEffect } from 'react';
-import Head from 'next/head';
-import Link from 'next/link';
 import { UL, H3, Overlay, Classes } from '@blueprintjs/core';
 import { useHover } from '../hooks/useHover';
 import { ipcRenderer } from 'electron';
+import Page from '../layout';
 
 type Param = { name: string; val: string };
 
 const useParameters = () => {
-	const [ params, setParams ] = useState(
+	const [params, setParams] = useState(
 		Array.from({ length: 150 }).map((_, i) => ({ name: 'aa' + i, val: 'sdf' } as Param))
 	);
 	useEffect(() => {
@@ -20,7 +19,7 @@ const useParameters = () => {
 		const tok = setInterval(() => {
 			// setParams(params.map((i) => ({ ...i, val: Math.random().toFixed(0) })));
 			ipcRenderer.send('update');
-		}, 100 / 10);
+		}, 100);
 		return () => {
 			console.log('CLEARING SHIT');
 			clearInterval(tok);
@@ -31,25 +30,27 @@ const useParameters = () => {
 const Home = () => {
 	const p = useParameters();
 	return (
-		<div style={{ display: 'flex' }}>
-			<div style={{ width: '80px', backgroundColor: '#00e1e1' }} />
+		<Page>
+			<div style={{ display: 'flex' }}>
+				<div style={{ width: '80px', backgroundColor: '#00e1e1' }} />
 
-			<UL style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-				{p.map((i) => <Item name={i.name} val={i.val} />)}
-			</UL>
-			{/* <p>
+				<UL style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+					{p.map((i) => <Item name={i.name} val={i.val} />)}
+				</UL>
+				{/* <p>
 						⚡ Electron + Next.js ⚡ -
 						<Link href="/next">
 							<a>Go to next page</a>
 						</Link>
 					</p>
 					<img src="/static/logo.png" /> */}
-		</div>
+			</div>
+		</Page>
 	);
 };
 
 const Item: React.FC<Param> = ({ name, val }) => {
-	const [ ref, isHovered ]: any = useHover();
+	const [ref, isHovered]: any = useHover();
 
 	return (
 		<li
