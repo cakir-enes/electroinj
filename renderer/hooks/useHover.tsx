@@ -1,4 +1,6 @@
-import { useState, useCallback, useRef, ReactNode } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { ipcRenderer } from 'electron';
+import { Param } from '../pages/home';
 
 export function useHover() {
 	const [ value, setValue ] = useState(false);
@@ -34,3 +36,24 @@ export function useHover() {
 
 	return [ callbackRef, value ];
 }
+
+export const useParameters = () => {
+	const [ params, setParams ] = useState(
+		Array.from({ length: 150 }).map((_, i) => ({ name: 'aa' + i, val: 'sdf' } as Param))
+	);
+	useEffect(() => {
+		ipcRenderer.on('update', (event, arg) => {
+			setParams(arg);
+		});
+
+		const tok = setInterval(() => {
+			// setParams(params.map((i) => ({ ...i, val: Math.random().toFixed(0) })));
+			ipcRenderer.send('update');
+		}, 100 / 10);
+		return () => {
+			console.log('CLEARING SHIT');
+			clearInterval(tok);
+		};
+	}, []);
+	return params;
+};
