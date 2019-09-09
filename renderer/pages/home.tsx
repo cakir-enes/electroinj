@@ -1,11 +1,12 @@
-import '@blueprintjs/core/lib/css/blueprint.css';
 import React, { useState, useEffect } from 'react';
 import { UL, H3, Overlay, Classes } from '@blueprintjs/core';
 import { useHover } from '../hooks/useHover';
 import { ipcRenderer } from 'electron';
 import Page from '../layout';
+import { Virtuoso } from 'react-virtuoso'
+import { Param } from '../../shared/types';
 
-type Param = { name: string; val: string };
+
 
 const useParameters = () => {
 	const [params, setParams] = useState(
@@ -33,10 +34,10 @@ const Home = () => {
 		<Page>
 			<div style={{ display: 'flex' }}>
 				<div style={{ width: '80px', backgroundColor: '#00e1e1' }} />
-
-				<UL style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+				<Virtuoso style={{ flexGrow: 1 }} totalCount={200} item={index => <div>Item {index}</div>} />
+				{/* <UL style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
 					{p.map((i) => <Item name={i.name} val={i.val} />)}
-				</UL>
+				</UL> */}
 				{/* <p>
 						⚡ Electron + Next.js ⚡ -
 						<Link href="/next">
