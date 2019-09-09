@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { ipcRenderer } from 'electron';
-import { Param } from '../pages/home';
+import { Param } from '../../shared/types';
 
 export function useHover() {
 	const [ value, setValue ] = useState(false);

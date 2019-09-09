@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UL, H3, Overlay, Classes } from '@blueprintjs/core';
+import { UL, H3, Overlay, Classes, H5 } from '@blueprintjs/core';
 import { useHover } from '../hooks/useHover';
 import { ipcRenderer } from 'electron';
 import Page from '../layout';
@@ -57,8 +57,7 @@ const Item: React.FC<Param> = ({ name, val }) => {
 			ref={ref}
 			style={{
 				display: 'flex',
-				justifyContent: 'space-between',
-				backgroundColor: `${isSelected ? '#00e3e3' : 'gray'}`
+				justifyContent: 'space-between'
 			}}
 		>
 			<H5 style={{ marginLeft: '15px' }}>{name}</H5>

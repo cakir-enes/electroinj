@@ -1,5 +1,5 @@
 import React from 'react';
-import Page from '../layouts';
+import Page from '../layout';
 
 const Select = () => {
 	return (

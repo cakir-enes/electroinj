@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import SelectionTree from '../components/selectionTree';
 import Page from '../layout';
 import ParamTree from '../components/antTree';
 
