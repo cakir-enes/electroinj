@@ -4,13 +4,11 @@ import MonitorList from '../components/monitorList';
 import { Param } from '../../shared/types';
 
 const Monitor = () => {
-	const [ params, setParams ] = useState(
+	const [params, setParams] = useState(
 		Array.from({ length: 150 }).map((_, i) => ({ name: 'aa' + i, val: 'sdf' } as Param))
 	);
 	return (
-		<Page>
-			<MonitorList params={params} />
-		</Page>
+		<MonitorList params={params} />
 	);
 };
 

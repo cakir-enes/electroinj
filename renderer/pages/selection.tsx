@@ -14,9 +14,7 @@ const Selection = () => {
 		ipcRenderer.send(RMI.AllParamInfo, '')
 	}, []);
 	return (
-		<Page>
-			<ParamTree params={pp} checked={checked} setChecked={(c) => setChecked(c)} />
-		</Page>
+		<ParamTree params={pp} checked={checked} setChecked={(c) => setChecked(c)} />
 	);
 };
 

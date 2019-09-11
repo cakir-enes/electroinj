@@ -3,9 +3,7 @@ import Page from '../layout';
 
 const Select = () => {
 	return (
-		<Page>
-			<div>SELECT</div>
-		</Page>
+		<div>SELECT</div>
 	);
 };
 

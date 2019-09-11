@@ -1,25 +1,26 @@
 import { Alignment, Button, Navbar } from '@blueprintjs/core';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
+import { useObservable, observer } from 'mobx-react-lite'
 
-const NavBar = () => {
-	const [ page, setPage ] = useState();
+const NavBar = observer(() => {
+	const store = useObservable({ page: 'home' })
 	useEffect(
 		() => {
-			console.log(`New page ${page}`);
+			console.log(`New page ${store.page}`);
 		},
-		[ page ]
+		[store.page]
 	);
 	const pageSetter = (p: string) => {
 		return () => {
 			console.log(p);
-			setPage(p);
+			store.page = p
 		};
 	};
 	return (
 		<Navbar>
 			<Navbar.Group align={Alignment.LEFT}>
-				<Navbar.Heading>{page}</Navbar.Heading>
+				<Navbar.Heading>{store.page}</Navbar.Heading>
 				<Navbar.Divider />
 				<Link href="/monitor">
 					<Button className="bp3-minimal" icon="document" text="Monitor" onClick={pageSetter('Mon')} />
@@ -30,5 +31,5 @@ const NavBar = () => {
 			</Navbar.Group>
 		</Navbar>
 	);
-};
+});
 export default NavBar;

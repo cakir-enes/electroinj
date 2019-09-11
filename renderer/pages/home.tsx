@@ -7,7 +7,7 @@ import { Virtuoso } from 'react-virtuoso';
 import { Param } from '../../shared/types';
 
 const useParameters = () => {
-	const [ params, setParams ] = useState(
+	const [params, setParams] = useState(
 		Array.from({ length: 150 }).map((_, i) => ({ name: 'aa' + i, val: 'sdf' } as Param))
 	);
 	useEffect(() => {
@@ -29,27 +29,25 @@ const useParameters = () => {
 const Home = () => {
 	const p = useParameters();
 	return (
-		<Page>
-			<div style={{ display: 'flex' }}>
-				<div style={{ width: '80px', backgroundColor: '#00e1e1' }} />
-				<Virtuoso style={{ flexGrow: 1 }} totalCount={200} item={(index) => <div>Item {index}</div>} />
-				{/* <UL style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+		<div style={{ display: 'flex' }}>
+			<div style={{ width: '80px', backgroundColor: '#00e1e1' }} />
+			<Virtuoso style={{ flexGrow: 1 }} totalCount={200} item={(index) => <div>Item {index}</div>} />
+			{/* <UL style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
 					{p.map((i) => <Item name={i.name} val={i.val} />)}
 				</UL> */}
-				{/* <p>
+			{/* <p>
 						⚡ Electron + Next.js ⚡ -
 						<Link href="/next">
 							<a>Go to next page</a>
 						</Link>
 					</p>
 					<img src="/static/logo.png" /> */}
-			</div>
-		</Page>
+		</div>
 	);
 };
 
 const Item: React.FC<Param> = ({ name, val }) => {
-	const [ ref, isHovered ]: any = useHover();
+	const [ref, isHovered]: any = useHover();
 
 	return (
 		<li
