@@ -30,16 +30,25 @@ if (isProd) {
 	if (!isProd) {
 		mainWindow.webContents.openDevTools();
 	}
-
-	const nc: Accessor = await NatsClient.createNew()
-
+	ipcMain.on('dene', (e, arg) => console.log(arg));
+	NatsClient.createNew()
+		.then((nc) => {
+			ipcMain.on(RMI.AllParamInfo, (event, arg) => {
+				console.log('AllParamInfo received');
+				event.reply(RMI.AllParamInfo, { FTE: arr });
+				// nc.allParameterInfo().then((v) => event.reply(RMI.AllParamInfo, v));
+			});
+		})
+		.catch((err) => console.error(err));
+	ipcMain.on(RMI.AllParamInfo, (event, arg) => {
+		console.log('AllParamInfo received');
+		event.reply(RMI.AllParamInfo, { FTE: arr });
+		// nc.allParameterInfo().then((v) => event.reply(RMI.AllParamInfo, v));
+	});
 	let arr = Array.from({ length: 150 }).map((_, i) => ({ name: 'aa' + i, val: 'sdf' }));
 	ipcMain.on('update', (event, arg) => {
 		event.reply('update', arr.map((i) => ({ ...i, val: Math.random().toFixed(3) })));
 	});
-	ipcMain.on(RMI.AllParamInfo, (event, arg) => {
-		nc.allParameterInfo().then(v => event.reply(RMI.AllParamInfo, v))
-	})
 })();
 
 app.on('window-all-closed', () => {

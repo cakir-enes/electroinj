@@ -1,9 +1,9 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { ipcRenderer } from 'electron';
-import { Param } from '../../shared/types';
+import { Parameter } from '../../shared/types';
 
 export function useHover() {
-	const [value, setValue] = useState(false);
+	const [ value, setValue ] = useState(false);
 
 	// Wrap in useCallback so we can use in dependencies below
 	const handleMouseOver = useCallback(() => setValue(true), []);
@@ -31,15 +31,15 @@ export function useHover() {
 				ref.current.addEventListener('mouseout', handleMouseOut);
 			}
 		},
-		[handleMouseOver, handleMouseOut]
+		[ handleMouseOver, handleMouseOut ]
 	);
 
-	return [callbackRef, value];
+	return [ callbackRef, value ];
 }
 
 export const useParameters = () => {
-	const [params, setParams] = useState(
-		Array.from({ length: 150 }).map((_, i) => ({ name: 'aa' + i, val: 'sdf' } as Param))
+	const [ params, setParams ] = useState(
+		Array.from({ length: 150 }).map((_, i) => ({ name: 'aa' + i, val: 'sdf' } as Partial<Parameter>))
 	);
 	useEffect(() => {
 		ipcRenderer.on('update', (event, arg) => {

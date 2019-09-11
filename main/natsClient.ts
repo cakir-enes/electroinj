@@ -1,6 +1,7 @@
 import { connect, Client, Msg, Payload } from 'ts-nats'
-import { Accessor, Enum, Val, ModInfo } from './accessor';
-import { Parameter } from '../shared/types';
+import { Accessor } from './accessor';
+
+import { Parameter, ModInfo } from '../shared/types';
 
 
 const mods = ["FTE", "ESM"]
@@ -16,8 +17,9 @@ function reflect<T>(p: Promise<T>): Promise<Status<T>> {
 // const reflect = p => (p.then(successHandler).catch(catchHandler))
 
 class NatsClient implements Accessor {
-    multiSet: (newVals: import("./accessor").PathVal[]) => void;
-    multiGet: (paths: string[]) => import("./accessor").PathVal[];
+    multiSet: (newVals: import("../shared/types").PathVal[]) => void;
+    multiGet: (paths: string[]) => import("../shared/types").PathVal[];
+    
 
     client: Client
 

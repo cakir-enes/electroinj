@@ -4,11 +4,11 @@ import { useHover } from '../hooks/useHover';
 import { ipcRenderer } from 'electron';
 import Page from '../layout';
 import { Virtuoso } from 'react-virtuoso';
-import { Param } from '../../shared/types';
+import { Parameter } from '../../shared/types';
 
 const useParameters = () => {
-	const [params, setParams] = useState(
-		Array.from({ length: 150 }).map((_, i) => ({ name: 'aa' + i, val: 'sdf' } as Param))
+	const [ params, setParams ] = useState(
+		Array.from({ length: 150 }).map((_, i) => ({ name: 'aa' + i, val: 'sdf' } as Parameter))
 	);
 	useEffect(() => {
 		ipcRenderer.on('update', (event, arg) => {
@@ -46,8 +46,8 @@ const Home = () => {
 	);
 };
 
-const Item: React.FC<Param> = ({ name, val }) => {
-	const [ref, isHovered]: any = useHover();
+const Item: React.FC<Parameter> = ({ name, val }) => {
+	const [ ref, isHovered ]: any = useHover();
 
 	return (
 		<li

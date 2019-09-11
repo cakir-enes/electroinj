@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import Page from '../layout';
 import ParamTree from '../components/antTree';
 import { ipcRenderer } from 'electron';
 import { RMI } from '../../shared/rpc';
+import { useModuleInfo } from '../hooks/useModuleInfo';
 
-const pp = { FTE: ['A.B.C.D', 'A.B.C', 'A.B.C.E', 'E.F.C', 'E.F.C.D.E'] };
 const Selection = () => {
-	const [checked, setChecked] = useState([]);
-	useEffect(() => {
-		ipcRenderer.on(RMI.AllParamInfo, (event, arg) => {
-			console.log(arg)
-		});
-		ipcRenderer.send(RMI.AllParamInfo, '')
-	}, []);
+	const [ checked, setChecked ] = useState([]);
+	const modInfo = useModuleInfo();
 	return (
-		<ParamTree params={pp} checked={checked} setChecked={(c) => setChecked(c)} />
+		<ParamTree
+			params={{ FTE: modInfo.params.map((v) => v.name) }}
+			checked={checked}
+			setChecked={(c) => setChecked(c)}
+		/>
 	);
 };
 

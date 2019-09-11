@@ -1,20 +1,20 @@
 import { Alignment, Button, Navbar } from '@blueprintjs/core';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
-import { useObservable, observer } from 'mobx-react-lite'
+import { useObservable, observer } from 'mobx-react-lite';
 
 const NavBar = observer(() => {
-	const store = useObservable({ page: 'home' })
+	const store = useObservable({ page: 'home' });
 	useEffect(
 		() => {
 			console.log(`New page ${store.page}`);
 		},
-		[store.page]
+		[ store.page ]
 	);
 	const pageSetter = (p: string) => {
 		return () => {
 			console.log(p);
-			store.page = p
+			store.page = p;
 		};
 	};
 	return (
