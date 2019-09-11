@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Tree } from 'antd';
 import 'antd/dist/antd.css';
 
@@ -17,7 +17,7 @@ function insert(node, path) {
 		if (!alreadyExists) {
 			let node = {
 				title: curr,
-				key: pre + '.' + curr,
+				key: JSON.stringify({ path: pre + '.' + curr, isLeaf: curr === pathParts[pathParts.length - 1] }),
 				children: []
 			};
 			children.push(node);
@@ -30,15 +30,20 @@ function insert(node, path) {
 }
 
 const ParamTree = ({ params, checked, setChecked }) => {
-	useEffect(() => console.log('CHECKED:' + checked), [checked]);
 	let [selectedKeys, setSelectedkeys] = useState([]);
+	let [selectedPaths, setSelectedPaths] = useState([]);
 	useEffect(
 		() => {
-			console.log(selectedKeys);
-		},
-		[selectedKeys]
-	);
-	let renderTreeNodes = (data) =>
+			setSelectedPaths(
+				checked
+					.map(v => JSON.parse(v))
+					.filter(v => v.isLeaf == true)
+					.map(v => v.path))
+
+			console.log(selectedPaths)
+		}, [checked]);
+
+	let renderTreeNodes = useCallback((data) =>
 		data.map((item) => {
 			if (item.children) {
 				return (
@@ -48,21 +53,17 @@ const ParamTree = ({ params, checked, setChecked }) => {
 				);
 			}
 			return <TreeNode key={item.key} {...item} />;
-		});
+		}), []);
 
 	return (
 		<Tree
 			checkable
-			//   autoExpandParent={expandParent}
-			//   onExpand={e => {
-			//     setExpanedKeys(e);
-			//     setExpandParent(false);
-			//   }}
-			//   expandedKeys={expandedKeys}
 			showLine
 			onSelect={(s) => setSelectedkeys(s)}
 			selectedKeys={selectedKeys}
-			onCheck={(c) => {
+			onCheck={(c, e) => {
+				// console.log(c)
+				// console.log(e)
 				Array.isArray(c) ? setChecked(c) : setChecked(c.checked);
 			}}
 			checkedKeys={checked}
@@ -70,7 +71,7 @@ const ParamTree = ({ params, checked, setChecked }) => {
 			{renderTreeNodes(
 				Object.keys(params)
 					.map((p) => {
-						let root = { title: p, key: p, children: [] };
+						let root = { title: p, key: JSON.stringify({ path: p, isLeaf: false }), children: [] };
 						params[p].forEach((n, i) => insert(root, n));
 						return root;
 					})
