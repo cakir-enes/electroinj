@@ -30,13 +30,13 @@ function insert(node, path) {
 }
 
 const ParamTree = ({ params, checked, setChecked }) => {
-	useEffect(() => console.log('CHECKED:' + checked), [ checked ]);
-	let [ selectedKeys, setSelectedkeys ] = useState([]);
+	useEffect(() => console.log('CHECKED:' + checked), [checked]);
+	let [selectedKeys, setSelectedkeys] = useState([]);
 	useEffect(
 		() => {
 			console.log(selectedKeys);
 		},
-		[ selectedKeys ]
+		[selectedKeys]
 	);
 	let renderTreeNodes = (data) =>
 		data.map((item) => {

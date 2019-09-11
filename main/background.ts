@@ -1,6 +1,9 @@
 import { app, ipcMain } from 'electron';
 import serve from 'electron-serve';
 import { createWindow, exitOnChange } from './helpers';
+import { Accessor } from './accessor';
+import NatsClient from './natsClient';
+import { RMI } from '../shared/rpc';
 
 const isProd: boolean = process.env.NODE_ENV === 'production';
 
@@ -28,10 +31,15 @@ if (isProd) {
 		mainWindow.webContents.openDevTools();
 	}
 
+	const nc: Accessor = await NatsClient.createNew()
+
 	let arr = Array.from({ length: 150 }).map((_, i) => ({ name: 'aa' + i, val: 'sdf' }));
 	ipcMain.on('update', (event, arg) => {
 		event.reply('update', arr.map((i) => ({ ...i, val: Math.random().toFixed(3) })));
 	});
+	ipcMain.on(RMI.AllParamInfo, (event, arg) => {
+		nc.allParameterInfo().then(v => event.reply(RMI.AllParamInfo, v))
+	})
 })();
 
 app.on('window-all-closed', () => {
