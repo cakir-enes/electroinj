@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import ParamTree from '../components/antTree';
 import { ipcRenderer } from 'electron';
-import { RMI } from '../../shared/rpc';
+import { REQ } from '../../shared/rpc';
 import { useModuleInfo } from '../hooks/useModuleInfo';
 
 const Selection = () => {
-	const [ checked, setChecked ] = useState([]);
-	const modInfo = useModuleInfo();
+	const [checked, setChecked] = useState([]);
+	const modInfo = { FTE: { params: [{ name: "A.B.C.D" }, { name: "A.B.E" }] } }
 	return (
 		<ParamTree
-			params={{ FTE: modInfo.params.map((v) => v.name) }}
+			params={Object.entries(modInfo).reduce((params, [name, info]) => {
+				params[name] = info.params.map(v => v.name)
+				return params
+			}, {})}
 			checked={checked}
 			setChecked={(c) => setChecked(c)}
 		/>

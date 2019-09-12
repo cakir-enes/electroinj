@@ -30,15 +30,15 @@ function insert(node, path) {
 }
 type Props = { params: { [key: string]: string[] }; checked: string[]; setChecked: (c: string[]) => void };
 const ParamTree: React.FC<Props> = ({ params, checked, setChecked }) => {
-	let [ selectedKeys, setSelectedkeys ] = useState([]);
-	let [ selectedPaths, setSelectedPaths ] = useState([]);
+	let [selectedKeys, setSelectedkeys] = useState([]);
+	let [selectedPaths, setSelectedPaths] = useState([]);
 	useEffect(
 		() => {
 			setSelectedPaths(checked.map((v) => JSON.parse(v)).filter((v) => v.isLeaf == true).map((v) => v.path));
 
 			console.log(selectedPaths);
 		},
-		[ checked ]
+		[checked]
 	);
 
 	let renderTreeNodes = useCallback(
@@ -59,7 +59,7 @@ const ParamTree: React.FC<Props> = ({ params, checked, setChecked }) => {
 	let formatParams = useCallback((data) => {
 		let entries = Object.entries<string[]>(data || {});
 		console.log(entries);
-		return entries.map(([ m, v ]) => {
+		return entries.map(([m, v]) => {
 			let root = { title: m, key: JSON.stringify({ path: m, isLeaf: false }), children: [] };
 			v.forEach((n) => insert(root, n));
 			return root;

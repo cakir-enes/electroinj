@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react';
-import { ModInfo } from '../../shared/types';
+import { ModsInfo } from '../../shared/types';
 import { ipcRenderer, IpcRenderer } from 'electron';
-import { RMI } from '../../shared/rpc';
+import { REQ } from '../../shared/rpc';
 
-export const useModuleInfo: () => ModInfo = () => {
-	const [ modInfo, setModInfo ] = useState<ModInfo>();
+export const useModuleInfo: () => ModsInfo = () => {
+	const [modInfo, setModInfo] = useState<ModsInfo>({ FTE: { params: [], enums: [] } });
 
 	useEffect(() => {
 		const handler = (e, arg) => {
 			setModInfo(arg);
-			console.log(`ARG: ${arg}`);
+			console.log(`ARG: ${JSON.stringify(arg)}`);
 		};
-		ipcRenderer.on(RMI.AllParamInfo, handler);
+		ipcRenderer.on(REQ.AllParamInfo, handler);
 		console.log('Sending rmi');
-		ipcRenderer.send(RMI.AllParamInfo, '');
+		ipcRenderer.send(REQ.AllParamInfo, '');
 		// setTimeout(
 		// 	() =>
 		// 		setModInfo({
@@ -22,7 +22,7 @@ export const useModuleInfo: () => ModInfo = () => {
 		// 		}),
 		// 	1000
 		// );
-		return () => ipcRenderer.removeListener(RMI.AllParamInfo, handler);
+		return () => ipcRenderer.removeListener(REQ.AllParamInfo, handler);
 	}, []);
-	return modInfo;
+	return modInfo
 };

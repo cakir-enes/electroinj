@@ -2,16 +2,17 @@ import { Parameter } from '../../shared/types';
 import { useHover } from '../hooks/useHover';
 import { H5, Colors, Classes } from '@blueprintjs/core';
 import { Virtuoso } from 'react-virtuoso';
+import { useEffect } from 'react';
 
-type Props = { params: Parameter[] };
+type Props = { params: { name: string, val: string }[] };
 
 const MonitorList: React.FC<Props> = ({ params }) => {
-	return <Virtuoso style={{ flexGrow: 1 }} totalCount={params.length} item={(idx) => <Item param={params[idx]} />} />;
+	return <Virtuoso style={{ flexGrow: 1, height: "100%" }} totalCount={params.length} item={(idx) => <Item param={params[idx]} />} />;
 };
 
-type ItemProps = { param: Parameter };
+type ItemProps = { param: { name: string, val: string } };
 const Item: React.FC<ItemProps> = ({ param }) => {
-	const [ ref, isHovered ]: any = useHover();
+	const [ref, isHovered]: any = useHover();
 
 	return (
 		<div

@@ -3,7 +3,8 @@ import serve from 'electron-serve';
 import { createWindow, exitOnChange } from './helpers';
 import { Accessor } from './accessor';
 import NatsClient from './natsClient';
-import { RMI } from '../shared/rpc';
+import { REQ } from '../shared/rpc';
+import { setInterval, clearInterval } from 'timers';
 
 const isProd: boolean = process.env.NODE_ENV === 'production';
 
@@ -26,30 +27,36 @@ if (isProd) {
 
 	const homeUrl: string = isProd ? 'app://./home.html' : 'http://localhost:8888/home';
 	mainWindow.loadURL(homeUrl);
+	initHandlers()
 
 	if (!isProd) {
 		mainWindow.webContents.openDevTools();
 	}
-	ipcMain.on('dene', (e, arg) => console.log(arg));
+
+})();
+
+const modParams = { FTE: { params: [{ name: "A.B.C", val: '34', type: 'str' }], enums: [{ name: 'abc', vals: ['a', 'v'] }] } }
+let params = Array.from({ length: 150 }).map((_, i) => ({ name: 'aa' + i, val: 'sdf' }))
+const initHandlers = () => {
 	NatsClient.createNew()
 		.then((nc) => {
-			ipcMain.on(RMI.AllParamInfo, (event, arg) => {
+			ipcMain.on(REQ.AllParamInfo, (event, arg) => {
 				console.log('AllParamInfo received');
-				event.reply(RMI.AllParamInfo, { FTE: arr });
+				event.reply(REQ.AllParamInfo, modParams);
 				// nc.allParameterInfo().then((v) => event.reply(RMI.AllParamInfo, v));
 			});
+			let tok: NodeJS.Timeout | null = null
+			ipcMain.on(REQ.SUBSCRIBE_PARAMS, (event, p, freq) => {
+				console.log(`SUB PARAMS: ${p}`)
+				tok = setInterval(() => {
+					let a = params.map(v => ({ ...v, val: Math.random().toFixed(3).toString() }))
+					event.reply(REQ.SUBSCRIBE_PARAMS, a)
+				}, freq)
+			})
+			ipcMain.on(REQ.UNSUB_PARAMS, (e, a) => clearInterval(tok))
 		})
 		.catch((err) => console.error(err));
-	ipcMain.on(RMI.AllParamInfo, (event, arg) => {
-		console.log('AllParamInfo received');
-		event.reply(RMI.AllParamInfo, { FTE: arr });
-		// nc.allParameterInfo().then((v) => event.reply(RMI.AllParamInfo, v));
-	});
-	let arr = Array.from({ length: 150 }).map((_, i) => ({ name: 'aa' + i, val: 'sdf' }));
-	ipcMain.on('update', (event, arg) => {
-		event.reply('update', arr.map((i) => ({ ...i, val: Math.random().toFixed(3) })));
-	});
-})();
+}
 
 app.on('window-all-closed', () => {
 	app.quit();

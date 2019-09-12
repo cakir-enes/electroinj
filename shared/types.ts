@@ -1,16 +1,20 @@
 export type Parameter = { name: string; val: string; type: string };
 
+export type ModsInfo = {
+    [key: string]: ModInfo
+}
+
 export type ModInfo = {
-	params: Parameter[];
-	enums: EnumVal[];
+    params: Parameter[];
+    enums: EnumVal[];
 };
 
 export type EnumVal = {
-	name: string;
-	vals: string[];
+    name: string;
+    vals: string[];
 };
 
 export type PathVal = {
-	path: string;
-	val: string;
+    path: string;
+    val: string;
 };
