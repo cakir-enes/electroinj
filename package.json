@@ -13,12 +13,11 @@
 	"dependencies": {
 		"@blueprintjs/core": "^3.18.0",
 		"@zeit/next-css": "^1.0.1",
-		"antd": "^3.23.2",
+		"@zeit/next-less": "^1.0.1",
+		"@zeit/next-sass": "^1.0.1",
 		"electron-serve": "^0.3.0",
 		"electron-store": "^4.0.0",
-		"mobx": "^5.13.0",
-		"mobx-react-lite": "^1.4.1",
-		"react-checkbox-tree": "^1.5.1",
+		"next-compose-plugins": "^2.2.0",
 		"react-virtuoso": "^0.12.0",
 		"ts-nats": "^1.2.4"
 	},
