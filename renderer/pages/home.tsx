@@ -1,8 +1,7 @@
-import { H1, Card } from "@blueprintjs/core";
-
+import { H1, Card, H2 } from "@blueprintjs/core";
 
 const Home = () => {
-    return <Card style={{ height: "100vh", alignContent: "center", justifyContent: "center", textAlign: "center" }}><H1>TEXT</H1></Card>
-}
+  return <H2>ELECTRO</H2>;
+};
 
-export default Home
+export default Home;

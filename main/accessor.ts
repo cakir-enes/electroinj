@@ -1,7 +1,7 @@
-import { ModInfo, PathVal } from '../shared/types';
+import {ModInfo, PathVal} from '../shared/types';
 
 export interface Accessor {
-	allParameterInfo: () => Promise<ModInfo>;
-	multiSet: (newVals: PathVal[]) => void;
-	multiGet: (paths: string[]) => PathVal[];
+  multiSet: (newVals: PathVal[]) => void;
+  multiGet: (paths: string[]) => Promise<{[keyof: string]: PathVal[]}>;
+  allParameterInfo: () => Promise<{[keyof: string]: ModInfo}>;
 }

@@ -1,23 +1,29 @@
-import { connect, Client, Msg, Payload } from "ts-nats";
-import { Accessor } from "./accessor";
+import {Client, connect, Msg, Payload} from 'ts-nats';
 
-import { PathVal, ModInfo, ModsInfo } from "../shared/types";
+import {ModInfo, ModsInfo, PathVal} from '../shared/types';
 
-const mods = ["FTE", "ESM"];
+import {Accessor} from './accessor';
 
-type Status<T> = { payload: T; resolved: boolean };
-const catchHandler = error =>
-  <Status<never>>{ payload: error, resolved: false };
+const mods = ['FTE', 'ESM'];
+
+type Status<T> = {
+  payload: T; resolved: boolean
+};
+const catchHandler = error => <Status<never>>{payload: error, resolved: false};
 function successHandler<T>(result: T) {
-  return <Status<T>>{ payload: result, resolved: true };
+  return <Status<T>>{payload: result, resolved: true};
 }
 function reflect<T>(p: Promise<T>): Promise<Status<T>> {
   return p.then(r => successHandler<T>(r)).catch(catchHandler);
 }
 // const reflect = p => (p.then(successHandler).catch(catchHandler))
 
-type NewValsMap = { [keyof: string]: PathVal[] };
-type ModInfoMap = { [keyof: string]: ModInfo };
+type NewValsMap = {
+  [keyof: string]: PathVal[]
+};
+type ModInfoMap = {
+  [keyof: string]: ModInfo
+};
 
 class NatsClient {
   private client: Client;
@@ -27,27 +33,25 @@ class NatsClient {
     console.log(`MULTI_SET REQ: ${JSON.stringify(map)}`);
     Object.keys(map).forEach(v => {
       console.log(`Sending request to ${v}.MULTI_SET -> ${map[v]}`);
-      this.client
-        .request(`${v}.MULTI_SET`, 500, map[v])
-        .catch(err => console.error(`COULDNT MULTI_SET values: ${err}`));
+      this.client.request(`${v}.MULTI_SET`, 500, map[v])
+          .catch(err => console.error(`COULDNT MULTI_SET values: ${err}`));
     });
   }
 
-  private groupByMods<T extends { path: string }>(
-    paths: T[] | string[]
-  ): Map<string, T[]> {
+  private groupByMods<T extends {path: string}>(paths: T[]|
+                                                string[]): Map<string, T[]> {
     let map = new Map<string, T[]>();
     paths.forEach(p => {
-      const isString = typeof p === "string";
+      const isString = typeof p === 'string';
       const path = isString ? p : p.path;
 
-      const idx = path.indexOf(".");
+      const idx = path.indexOf('.');
       const mod = path.substr(0, idx);
-      p = isString
-        ? path.substr(idx + 1)
-        : { ...p, path: path.substr(idx + 1) };
-      if (map[mod]) map[mod].push(p);
-      else map[mod] = [p];
+      p = isString ? path.substr(idx + 1) : {...p, path: path.substr(idx + 1)};
+      if (map[mod])
+        map[mod].push(p);
+      else
+        map[mod] = [p];
     });
     return map;
   }
@@ -56,48 +60,42 @@ class NatsClient {
     let map = this.groupByMods(paths);
     let ans = <NewValsMap>{};
     console.log(`MULTI_GET_REQ: ${JSON.stringify(map)}`);
-    return new Promise(res =>
-      Promise.all(
-        Object.keys(map).map(m =>
-          reflect<Msg>(this.client.request(`${m}.MULTI_GET`, 500, map[m]))
-        )
-      )
-        .then(results =>
-          Object.keys(map).map<[string, Status<Msg>]>((m, i) => [m, results[i]])
-        )
-        .then(msgs =>
-          msgs.forEach(([mod, msg]) =>
-            msg.resolved
-              ? (ans[mod] = msg.payload.data)
-              : console.error(`COULDNT FETCH VALUES OF ${mod}`)
-          )
-        )
-        .then(() => res(ans))
-    );
+    return new Promise(
+        res => Promise
+                   .all(Object.keys(map).map(
+                       m => reflect<Msg>(
+                           this.client.request(`${m}.MULTI_GET`, 500, map[m]))))
+                   .then(
+                       results => Object.keys(map).map<[string, Status<Msg>]>(
+                           (m, i) => [m, results[i]]))
+                   .then(
+                       msgs => msgs.forEach(
+                           ([mod, msg]) => msg.resolved ?
+                               (ans[mod] = msg.payload.data) :
+                               console.error(`COULDNT FETCH VALUES OF ${mod}`)))
+                   .then(() => res(ans)));
   }
 
   static async createNew(): Promise<NatsClient> {
     return new Promise<NatsClient>((res, rej) => {
-      connect({ payload: Payload.JSON })
-        .then(conn => {
-          let nc = new NatsClient();
-          nc.client = conn;
-          res(nc);
-        })
-        .catch(err => rej(err));
+      connect({payload: Payload.JSON})
+          .then(conn => {
+            let nc = new NatsClient();
+            nc.client = conn;
+            res(nc);
+          })
+          .catch(err => rej(err));
     });
   }
 
   async allParameterInfo(): Promise<ModInfoMap> {
     let info = <ModInfoMap>{};
-    await Promise.all(
-      mods.map(m => reflect<Msg>(this.client.request(`${m}.DISCOVER`)))
-    )
-      .then(results =>
-        mods.map<[string, Status<Msg>]>((m, i) => [m, results[i]])
-      )
-      .then(msgs =>
-        msgs.forEach(([mod, msg]) => {
+    await Promise
+        .all(mods.map(m => reflect<Msg>(this.client.request(`${m}.DISCOVER`))))
+        .then(
+            results =>
+                mods.map<[string, Status<Msg>]>((m, i) => [m, results[i]]))
+        .then(msgs => msgs.forEach(([mod, msg]) => {
           if (msg.resolved) {
             info[mod] = <ModInfo>{};
             info[mod].enums = msg.payload.data.enums;
@@ -105,9 +103,8 @@ class NatsClient {
           } else {
             console.error(`Couldnt fetch param infos of ${mod}`);
           }
-        })
-      )
-      .catch(err => console.error(`Error Fetcing ParamInfos: ${err}`));
+        }))
+        .catch(err => console.error(`Error Fetcing ParamInfos: ${err}`));
     return new Promise(res => {
       res(info);
     });

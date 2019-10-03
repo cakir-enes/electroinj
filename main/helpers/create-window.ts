@@ -1,14 +1,12 @@
-import {
-  screen,
-  BrowserWindow,
-  BrowserWindowConstructorOptions,
-} from 'electron';
+import {BrowserWindow, BrowserWindowConstructorOptions, screen,} from 'electron';
 import * as Store from 'electron-store';
 
-export default (windowName: string, options: BrowserWindowConstructorOptions): BrowserWindow => {
+export default (
+    windowName: string,
+    options: BrowserWindowConstructorOptions): BrowserWindow => {
   const key = 'window-state';
   const name = `window-state-${windowName}`;
-  const store = new Store({ name });
+  const store = new Store({name});
   const defaultSize = {
     width: options.width,
     height: options.height,
@@ -31,11 +29,9 @@ export default (windowName: string, options: BrowserWindowConstructorOptions): B
 
   const windowWithinBounds = (windowState, bounds) => {
     return (
-      windowState.x >= bounds.x &&
-      windowState.y >= bounds.y &&
-      windowState.x + windowState.width <= bounds.x + bounds.width &&
-      windowState.y + windowState.height <= bounds.y + bounds.height
-    );
+        windowState.x >= bounds.x && windowState.y >= bounds.y &&
+        windowState.x + windowState.width <= bounds.x + bounds.width &&
+        windowState.y + windowState.height <= bounds.y + bounds.height);
   };
 
   const resetToDefaults = () => {
@@ -74,6 +70,8 @@ export default (windowName: string, options: BrowserWindowConstructorOptions): B
       nodeIntegration: true,
     },
   };
+  BrowserWindow.addDevToolsExtension(
+      'C:/Users/Enes/AppData/Local/Google/Chrome/User Data/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.1.3_0')
   win = new BrowserWindow(browserOptions);
 
   win.on('close', saveState);

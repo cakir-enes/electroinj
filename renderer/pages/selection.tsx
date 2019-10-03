@@ -29,6 +29,7 @@ root.addChild(ch3);
 ch1.addChild(ch2);
 ch2.addChild(ch4);
 ch2.addChild(ch5);
+let checkedMap = new Map<string, boolean>();
 
 let insert = (node: Node<string>, path: string) => {
   const pathParts = path.split(".");
@@ -41,7 +42,7 @@ let insert = (node: Node<string>, path: string) => {
     alreadyExists = idx >= 0;
 
     if (!alreadyExists) {
-      let child = new Node<string>(curr, curr);
+      let child = new Node<string>(pre + "." + curr, curr);
       current.addChild(child);
       current = child;
     } else {
@@ -53,7 +54,6 @@ let insert = (node: Node<string>, path: string) => {
 
 let formatParams = (data: ModsInfo) => {
   let mods = Object.keys(data);
-  console.log(mods);
   return mods.map(k => {
     let m = data[k];
     let root = new Node<string>(k, k);
@@ -62,7 +62,10 @@ let formatParams = (data: ModsInfo) => {
   });
 };
 
-const NodeRenderer: React.FC<{ node: Node<string> }> = ({ node }) => {
+const NodeRenderer: React.FC<{
+  node: Node<string>;
+  setCheckInfo: (path: string, check: boolean) => void;
+}> = ({ node, setCheckInfo }) => {
   let [checked, setChecked] = useState(false);
   let [indeterminate, setIndeterminate] = useState(false);
   let [isExpanded, setIsExpanded] = useState(false);
@@ -71,14 +74,19 @@ const NodeRenderer: React.FC<{ node: Node<string> }> = ({ node }) => {
     node.bindOnChange(cs => {
       switch (cs) {
         case CheckStatus.ALL:
+          console.log(`CHECKED: ${node.label} ${node.data}`);
+          setCheckInfo(node.data, true);
+
           setChecked(true);
           setIndeterminate(false);
           break;
         case CheckStatus.NONE:
+          setCheckInfo(node.data, false);
           setChecked(false);
           setIndeterminate(false);
           break;
         case CheckStatus.PARTIAL:
+          setCheckInfo(node.data, false);
           setChecked(false);
           setIndeterminate(true);
       }
@@ -101,23 +109,45 @@ const NodeRenderer: React.FC<{ node: Node<string> }> = ({ node }) => {
             node.toggle();
           }}
         />
-        <H5 className={Classes.TREE_NODE_LABEL}>{node.label}</H5>
+        <H5>{node.label}</H5>
       </div>
-      {isExpanded
-        ? node.children.map((i, c) => <NodeRenderer node={i} />)
-        : null}
+      {node.children.map((i, c) => (
+        <span hidden={!isExpanded}>
+          <NodeRenderer node={i} setCheckInfo={setCheckInfo} />
+        </span>
+      ))}
     </UL>
   );
 };
 
 const Selection = () => {
   let modInfo = useModuleInfo();
+  let [cMap, setCMap] = useState({});
+  useEffect(() => {
+    let mods = Object.keys(modInfo);
+    mods.forEach(k => {
+      let m = modInfo[k];
+      console.log(`PARAMS: ${m.params}`);
+      // m["params"].forEach(n => (cMap[k + "." + n.name] = false));
 
+      m["params"].forEach(n => {
+        let l = k + "." + n.name;
+        setCMap(m => ({ ...m, [l]: false }));
+      });
+      console.log(cMap);
+    });
+  }, [modInfo]);
   return (
     <React.Fragment>
-      <H4>{JSON.stringify(modInfo)}</H4>
+      <H4>{JSON.stringify(cMap)}</H4>
       {formatParams(modInfo).map(v => (
-        <NodeRenderer node={v} />
+        <NodeRenderer
+          node={v}
+          setCheckInfo={(path: string, check: boolean) => {
+            cMap[path] && setCMap(map => ({ ...map, [path]: true }));
+            console.log(`NewMAP: ${JSON.stringify(cMap)}`);
+          }}
+        />
       ))}
     </React.Fragment>
   );
