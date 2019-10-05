@@ -1,8 +1,14 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo
+} from "react";
 import Node, { CheckStatus } from "../components/Node";
 import { ipcRenderer } from "electron";
 import { REQ } from "../../shared/rpc";
-import { useModuleInfo } from "../hooks/useModuleInfo";
+import { useModuleInfo, useModInfoTree } from "../hooks/useModuleInfo";
 import { TreeExample } from "../components/blueTree";
 import {
   UL,
@@ -15,7 +21,7 @@ import {
   H6,
   H5
 } from "@blueprintjs/core";
-import { ModInfo, ModsInfo } from "../../shared/types";
+import { ModInfo, ModInfoMap } from "../../shared/types";
 
 let root = new Node<string>("ROOT", "ROOT");
 let ch1 = new Node<string>("CH1", "Ch1");
@@ -31,67 +37,48 @@ ch2.addChild(ch4);
 ch2.addChild(ch5);
 let checkedMap = new Map<string, boolean>();
 
-let insert = (node: Node<string>, path: string) => {
-  const pathParts = path.split(".");
-  let current = node;
-
-  pathParts.reduce((pre, curr) => {
-    let children = current.children || [];
-    let alreadyExists = false;
-    let idx = children.findIndex(ch => ch.label === curr);
-    alreadyExists = idx >= 0;
-
-    if (!alreadyExists) {
-      let child = new Node<string>(pre + "." + curr, curr);
-      current.addChild(child);
-      current = child;
-    } else {
-      current = children[idx];
-    }
-    return pre + "." + curr;
-  }, node.label);
-};
-
-let formatParams = (data: ModsInfo) => {
-  let mods = Object.keys(data);
-  return mods.map(k => {
-    let m = data[k];
-    let root = new Node<string>(k, k);
-    m["params"].forEach(n => insert(root, n.name));
-    return root;
-  });
-};
-
 const NodeRenderer: React.FC<{
   node: Node<string>;
-  setCheckInfo: (path: string, check: boolean) => void;
-}> = ({ node, setCheckInfo }) => {
+  onChange: (path: string, check: boolean) => void;
+}> = React.memo(({ node, onChange: onChange }) => {
   let [checked, setChecked] = useState(false);
   let [indeterminate, setIndeterminate] = useState(false);
   let [isExpanded, setIsExpanded] = useState(false);
-
+  let isLeaf = useMemo(() => node.children.length === 0, [
+    node.children.length
+  ]);
+  // useEffect(() => {
+  //   console.log(`CALLED ${node.data} <- ${checked}`);
+  //   onChange(node.data, checked);
+  // }, [checked]);
   useEffect(() => {
-    node.bindOnChange(cs => {
+    console.log(`CHANGED ${node.data} <- ${checked}`);
+    isLeaf && onChange(node.data, checked);
+  }, [checked]);
+  useEffect(() => {
+    console.log("asdas");
+    let a = node.bindOnChange(cs => {
+      console.log(`CHECKED: ${node.data} -> ${cs}`);
       switch (cs) {
         case CheckStatus.ALL:
-          console.log(`CHECKED: ${node.label} ${node.data}`);
-          setCheckInfo(node.data, true);
-
           setChecked(true);
           setIndeterminate(false);
+          // onChange(node.data, true);
           break;
         case CheckStatus.NONE:
-          setCheckInfo(node.data, false);
           setChecked(false);
           setIndeterminate(false);
+          // onChange(node.data, false);
           break;
         case CheckStatus.PARTIAL:
-          setCheckInfo(node.data, false);
           setChecked(false);
           setIndeterminate(true);
+        // onChange(node.data, false);
       }
     });
+    return a;
   }, [node]);
+
   return (
     <UL className={Classes.TREE}>
       <div className={Classes.TREE_NODE} style={{ display: "flex" }}>
@@ -109,47 +96,38 @@ const NodeRenderer: React.FC<{
             node.toggle();
           }}
         />
-        <H5>{node.label}</H5>
+        <H5 onClick={() => node.addChild(new Node<string>("abc", "new"))}>
+          {node.label}
+        </H5>
       </div>
       {node.children.map((i, c) => (
         <span hidden={!isExpanded}>
-          <NodeRenderer node={i} setCheckInfo={setCheckInfo} />
+          <NodeRenderer node={i} onChange={onChange} />
         </span>
       ))}
     </UL>
   );
-};
+});
 
 const Selection = () => {
-  let modInfo = useModuleInfo();
-  let [cMap, setCMap] = useState({});
-  useEffect(() => {
-    let mods = Object.keys(modInfo);
-    mods.forEach(k => {
-      let m = modInfo[k];
-      console.log(`PARAMS: ${m.params}`);
-      // m["params"].forEach(n => (cMap[k + "." + n.name] = false));
+  let modInfo = useModInfoTree();
+  // let [selections, setSelections] = useState([]);
+  let [selections, setSelections] = useState({});
 
-      m["params"].forEach(n => {
-        let l = k + "." + n.name;
-        setCMap(m => ({ ...m, [l]: false }));
-      });
-      console.log(cMap);
-    });
-  }, [modInfo]);
+  let onChange = useCallback((path: string, check: boolean) => {
+    // setSelections(s => (check ? [...s, path] : s.filter(x => x != path)));
+    setSelections(x => ({ ...x, [path]: check }));
+  }, []);
+
   return (
-    <React.Fragment>
-      <H4>{JSON.stringify(cMap)}</H4>
-      {formatParams(modInfo).map(v => (
-        <NodeRenderer
-          node={v}
-          setCheckInfo={(path: string, check: boolean) => {
-            cMap[path] && setCMap(map => ({ ...map, [path]: true }));
-            console.log(`NewMAP: ${JSON.stringify(cMap)}`);
-          }}
-        />
+    <div>
+      <H4 onClick={() => console.log(JSON.stringify(checkedMap))}>
+        {JSON.stringify(selections)}
+      </H4>
+      {modInfo.map(v => (
+        <NodeRenderer node={v} onChange={onChange} />
       ))}
-    </React.Fragment>
+    </div>
   );
 };
 

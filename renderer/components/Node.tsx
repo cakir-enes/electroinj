@@ -24,6 +24,9 @@ export default class Node<T> {
   }
   bindOnChange(fn: (cs: CheckStatus) => void) {
     this.fn = fn;
+    return () => {
+      this.fn = null;
+    };
   }
   toggle() {
     switch (this.checkStatus) {
