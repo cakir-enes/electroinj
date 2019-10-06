@@ -1,8 +1,9 @@
 import { H4 } from "@blueprintjs/core";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useContext } from "react";
 import Node from "../components/Node";
 import { NodeRenderer } from "../components/NodeRenderer";
 import { useModInfoTree } from "../hooks/useModuleInfo";
+import { SelectedPathsContext } from "../hooks/useParameters";
 
 let root = new Node<string>("ROOT", "ROOT");
 let ch1 = new Node<string>("CH1", "Ch1");
@@ -19,22 +20,33 @@ ch2.addChild(ch5);
 let checkedMap = new Map<string, boolean>();
 
 const Selection = () => {
-  let modInfo = useModInfoTree();
   // let [selections, setSelections] = useState([]);
-  let [selections, setSelections] = useState({});
+  let { selections, setSelections, modInfo } = useContext(SelectedPathsContext);
+  let modInfoTree = useModInfoTree(modInfo);
 
-  let onChange = useCallback((path: string, check: boolean) => {
-    // setSelections(s => (check ? [...s, path] : s.filter(x => x != path)));
-    setSelections(x => ({ ...x, [path]: check }));
-  }, []);
+  let onChange = useCallback(
+    (path: string, check: boolean) => {
+      const mod = path.substring(0, path.indexOf("."));
+      const rawPath = path.substring(path.indexOf(".") + 1);
+      if (check != undefined) {
+        setSelections(x => ({
+          ...x,
+          [mod]: check
+            ? [...x[mod], rawPath]
+            : x[mod].filter(a => a !== rawPath)
+        }));
+      }
+    },
+    [selections]
+  );
 
   return (
     <div>
-      <H4 onClick={() => console.log(JSON.stringify(checkedMap))}>
+      <H4 onClick={() => console.log(JSON.stringify(selections))}>
         {JSON.stringify(selections)}
       </H4>
-      {modInfo.map(v => (
-        <NodeRenderer node={v} onChange={onChange} />
+      {modInfoTree.map(v => (
+        <NodeRenderer key={v.label} node={v} onChange={onChange} />
       ))}
     </div>
   );

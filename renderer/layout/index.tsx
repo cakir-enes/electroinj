@@ -1,6 +1,7 @@
 import "@blueprintjs/core/lib/css/blueprint.css";
 import React, { useState, useMemo } from "react";
 import NavBar from "../components/navbar";
+import { SelectedPathsProvider } from "../hooks/useParameters";
 
 const Page = ({ children }) => {
   return (
@@ -17,7 +18,7 @@ const Page = ({ children }) => {
       }}
     >
       <NavBar />
-      {children}
+      <SelectedPathsProvider>{children}</SelectedPathsProvider>
     </div>
   );
 };

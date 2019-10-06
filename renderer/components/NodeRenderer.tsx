@@ -12,18 +12,14 @@ export const NodeRenderer: React.FC<{
   let isLeaf = useMemo(() => node.children.length === 0, [
     node.children.length
   ]);
-  // useEffect(() => {
-  //   console.log(`CALLED ${node.data} <- ${checked}`);
-  //   onChange(node.data, checked);
-  // }, [checked]);
+
   useEffect(() => {
-    console.log(`CHANGED ${node.data} <- ${checked}`);
-    isLeaf && onChange(node.data, checked);
+    // console.log(`CHANGED ${node.data} <- isLeaf: ${isLeaf} ${checked}`);
+    onChange(node.data, isLeaf ? checked : undefined);
   }, [checked]);
   useEffect(() => {
-    console.log("asdas");
     let a = node.bindOnChange(cs => {
-      console.log(`CHECKED: ${node.data} -> ${cs}`);
+      //   console.log(`CHECKED: ${node.data} -> ${cs}`);
       switch (cs) {
         case CheckStatus.ALL:
           setChecked(true);
@@ -65,8 +61,12 @@ export const NodeRenderer: React.FC<{
         </H5>
       </div>
       {node.children.map((i, c) => (
-        <span hidden={!isExpanded}>
-          <NodeRenderer node={i} onChange={onChange} />
+        <span key={node.label} hidden={!isExpanded}>
+          <NodeRenderer
+            key={`${node.label}.${i.label}.${c}`}
+            node={i}
+            onChange={onChange}
+          />
         </span>
       ))}
     </UL>

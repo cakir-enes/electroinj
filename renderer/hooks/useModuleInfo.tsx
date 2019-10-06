@@ -6,7 +6,7 @@ import Node from "../components/Node";
 
 export const useModuleInfo: () => ModInfoMap = () => {
   const [modInfo, setModInfo] = useState<ModInfoMap>({
-    FTE: { params: [], enums: [] }
+    // FTE: { params: [], enums: [] }
   });
 
   useEffect(() => {
@@ -30,8 +30,9 @@ export const useModuleInfo: () => ModInfoMap = () => {
   return modInfo;
 };
 
-export const useModInfoTree: () => Node<string>[] = () => {
-  let modInfo = useModuleInfo();
+export const useModInfoTree: (
+  modInfo: ModInfoMap
+) => Node<string>[] = modInfo => {
   let [tree, setTree] = useState([]);
   useEffect(() => {
     setTree(formatParams(modInfo));
