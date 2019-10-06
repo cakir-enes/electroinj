@@ -13,15 +13,23 @@ export const initHandlers = () => {
 
       let tok: NodeJS.Timeout | null = null;
       ipcMain.on(REQ.SUBSCRIBE_PARAMS, (event, p, freq) => {
-        console.log(`SUB PARAMS: ${p}`);
+        console.log(`SUB PARAMS: ${JSON.stringify(p)}`);
         tok = setInterval(() => {
-          let a = params.map(v => ({
-            ...v,
-            val: Math.random()
-              .toFixed(3)
-              .toString()
-          }));
-          event.reply(REQ.SUBSCRIBE_PARAMS, a);
+          let newVals = Object.entries(p)
+            .map(([mod, params]: [string, string[]]) =>
+              params.map(param => ({
+                name: `${mod}.${param}`,
+                val: Math.random().toFixed(3)
+              }))
+            )
+            .flat();
+          //   let a = params.map(v => ({
+          //     ...v,
+          //     val: Math.random()
+          //       .toFixed(3)
+          //       .toString()
+          //   }));
+          event.reply(REQ.SUBSCRIBE_PARAMS, newVals);
         }, freq);
       });
       ipcMain.on(REQ.UNSUB_PARAMS, (e, a) => clearInterval(tok));
@@ -35,7 +43,7 @@ const modParams = {
     enums: [{ name: "abc", vals: ["a", "v"] }]
   },
   ESM: {
-    params: Array.from({ length: 3 }).map(i => ({
+    params: Array.from({ length: 150 }).map((_, i) => ({
       name: `A.X.${i}`,
       val: `${i}`,
       type: "int"

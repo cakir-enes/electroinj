@@ -61,12 +61,8 @@ export const NodeRenderer: React.FC<{
         </H5>
       </div>
       {node.children.map((i, c) => (
-        <span key={node.label} hidden={!isExpanded}>
-          <NodeRenderer
-            key={`${node.label}.${i.label}.${c}`}
-            node={i}
-            onChange={onChange}
-          />
+        <span key={node.label + c} hidden={!isExpanded}>
+          <NodeRenderer node={i} onChange={onChange} />
         </span>
       ))}
     </UL>

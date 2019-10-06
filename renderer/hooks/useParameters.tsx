@@ -13,10 +13,10 @@ export const useParameters = (reqParams: ModParams) => {
       setParams(arg);
     };
     ipcRenderer.on(REQ.SUBSCRIBE_PARAMS, handler);
-    console.log(`Requested: ${JSON.stringify(reqParams)}`);
-    ipcRenderer.send(REQ.SUBSCRIBE_PARAMS, params, 1000 / 15);
+    // console.log(`Requested: ${JSON.stringify(reqParams)}`);
+    ipcRenderer.send(REQ.SUBSCRIBE_PARAMS, reqParams, 1000 / 15);
     return () => {
-      console.log("useParameter: Clean up");
+      // console.log("useParameter: Clean up");
       ipcRenderer.removeListener(REQ.SUBSCRIBE_PARAMS, handler);
       ipcRenderer.send(REQ.UNSUB_PARAMS, "");
     };

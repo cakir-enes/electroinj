@@ -1,30 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useHover } from "../hooks/useHover";
 import {
-  H5,
-  Colors,
-  Callout,
-  Drawer,
-  H1,
-  H3,
-  H2,
-  H4,
-  Label,
   Button,
-  Card,
+  Callout,
   Classes,
-  Blockquote,
+  Colors,
   Divider,
-  MenuDivider,
-  ControlGroup,
-  Popover,
-  Switch,
-  InputGroup,
-  Icon,
-  Intent
+  H5,
+  InputGroup
 } from "@blueprintjs/core";
+import { IconNames } from "@blueprintjs/icons";
+import React, { useEffect, useRef, useState } from "react";
 import { Virtuoso } from "react-virtuoso";
-import { IconSvgPaths16, IconNames } from "@blueprintjs/icons";
+import { useHover } from "../hooks/useHover";
 
 type Props = { params: { name: string; val: string }[] };
 
