@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Node, { CheckStatus } from "./Node";
-import { UL, Checkbox, Classes, Icon, H5 } from "@blueprintjs/core";
+import { UL, Checkbox, Classes, Icon, H5, Button, ButtonGroup } from "@blueprintjs/core";
 
 export const NodeRenderer: React.FC<{
   node: Node<string>;
@@ -41,6 +41,7 @@ export const NodeRenderer: React.FC<{
   }, [node]);
   return (
     <UL className={Classes.TREE}>
+
       <div className={Classes.TREE_NODE} style={{ display: "flex" }}>
         {node.children.length != 0 ? (
           <Icon
@@ -55,11 +56,11 @@ export const NodeRenderer: React.FC<{
           onChange={() => {
             node.toggle();
           }}
+          style={{ float: "left" }}
         />
-        <H5 onClick={() => node.addChild(new Node<string>("abc", "new"))}>
-          {node.label}
-        </H5>
+        <H5 style={{}}>{node.label}</H5>
       </div>
+
       {node.children.map((i, c) => (
         <span key={node.label + c} hidden={!isExpanded}>
           <NodeRenderer node={i} onChange={onChange} />

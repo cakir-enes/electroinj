@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import MonitorList from "../components/monitorList";
+import MonitorList from "../components/MonitorList";
 import { useParameters, SelectedPathsContext } from "../hooks/useParameters";
 import { ipcRenderer } from "electron";
 import { REQ } from "../../shared/rpc";

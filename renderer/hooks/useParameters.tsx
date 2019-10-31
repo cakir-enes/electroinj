@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import { ipcRenderer } from "electron";
 import { REQ } from "../../shared/rpc";
 import { useModuleInfo } from "./useModuleInfo";
+import { Parameter } from "../../shared/types";
 
 type ModParams = { [key: string]: string[] };
 
 export const useParameters = (reqParams: ModParams) => {
-  const [params, setParams] = useState<{ name: string; val: string }[]>([]);
+  const [params, setParams] = useState<Parameter[]>([]);
   useEffect(() => {
     const handler = (_, arg) => {
       setParams(arg);
@@ -26,7 +27,7 @@ export const useParameters = (reqParams: ModParams) => {
 
 export const SelectedPathsContext = React.createContext({
   selections: {},
-  setSelections: (a: {}) => {},
+  setSelections: (a: {}) => { },
   modInfo: {}
 });
 

@@ -17,21 +17,23 @@ export const Sidebar = () => {
     <div
       style={{
         height: "100%",
-        justifyContent: "center",
-        backgroundColor: `${Colors.DARK_GRAY1}`
+        // justifyContent: "center",
+        backgroundColor: `${Colors.LIGHT_GRAY2}`
       }}
     >
-      <Item page="/home" icon={IconNames.ADD} />
-      <Item page="/select" icon={IconNames.TREE} />
-      <Item page="/monitor" icon={IconNames.DELTA} />
+      <ButtonGroup vertical style={{ width: "100%" }}>
+        <Item page="/home" icon={IconNames.HOME} />
+        <Item page="/selection" icon={IconNames.SMALL_TICK} />
+        <Item page="/monitor" icon={IconNames.EYE_OPEN} />
+      </ButtonGroup>
     </div>
   );
 };
 
 const Item = ({ page, icon }) => (
   <Link href={page}>
-    <Button large fill>
-      <Icon icon={icon} iconSize={28} />
+    <Button fill>
+      <Icon icon={icon} />
     </Button>
   </Link>
 );

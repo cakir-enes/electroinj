@@ -8,11 +8,14 @@ import {
   InputGroup
 } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Virtuoso } from "react-virtuoso";
 import { useHover } from "../hooks/useHover";
+import { ipcRenderer } from "electron";
+import { REQ } from "../../shared/rpc";
+import { Parameter } from "../../shared/types";
 
-type Props = { params: { name: string; val: string }[] };
+type Props = { params: Parameter[] };
 
 const MonitorList: React.FC<Props> = ({ params }) => {
   const [open, setOpen] = useState(false);
@@ -39,30 +42,6 @@ const MonitorList: React.FC<Props> = ({ params }) => {
           />
         )}
       />
-      {/* <Drawer isOpen={open} position="bottom" size="45px" hasBackdrop={false} onClose={() => setOpen(false)}>
-				<Callout
-					style={{
-						display: 'flex',
-						alignItems: 'baseline',
-						alignContent: 'center',
-						height: '100%',
-						justifyContent: 'space-between'
-					}}
-				>
-					<div style={{ display: 'flex', marginLeft: '10%' }}>
-						<Info a="Path: " b={params[paramRef.current] && params[paramRef.current].name} />
-						<Divider />
-						<Info a="Type: " b="valval" />
-						<Divider />
-						<Info a="Status:" b="Normal" />
-						<Divider />
-						<Info a="Value: " b={params[paramRef.current] && params[paramRef.current].val} />
-					</div>
-					<div style={{ marginRight: '10%' }}>
-						<input className={Classes.INPUT} type="text" placeholder="New Value" dir="auto" />
-					</div>
-				</Callout>
-			</Drawer> */}
     </React.Fragment>
   );
 };
@@ -77,7 +56,7 @@ const Info = ({ a, b }) => (
 );
 
 type ItemProps = {
-  param: { name: string; val: string };
+  param: { name: string; val: string, type: string };
   onClick: any;
   showDetails: boolean;
   hideDetails: Function;
@@ -91,6 +70,14 @@ const Item: React.FC<ItemProps> = ({
   isOdd
 }) => {
   const [ref, isHovered]: any = useHover();
+  const [newVal, setNewVal] = useState()
+
+  const setter = useCallback(() => {
+    ipcRenderer.send(REQ.SET, param.name, newVal)
+    console.log(`Sending set req ${param.name} -> ${newVal}`)
+    setNewVal("")
+  }, [newVal])
+
   return (
     <div
       key={name}
@@ -105,9 +92,9 @@ const Item: React.FC<ItemProps> = ({
           isHovered
             ? "#00e3e3"
             : isOdd
-            ? Colors.LIGHT_GRAY4
-            : Colors.LIGHT_GRAY1
-        }`,
+              ? Colors.LIGHT_GRAY4
+              : Colors.LIGHT_GRAY1
+          }`,
         borderBottom: "1px"
       }}
     >
@@ -133,7 +120,10 @@ const Item: React.FC<ItemProps> = ({
                 backgroundColor: Colors.LIGHT_GRAY4
               }}
               placeholder="New value"
-              rightElement={<Button minimal text="SET" />}
+              type="text"
+              value={newVal}
+              onChange={e => setNewVal(e.target.value)}
+              rightElement={<Button minimal text="SET" onClick={() => setter()} />}
             />
             <Button
               icon={IconNames.CROSS}
@@ -145,48 +135,20 @@ const Item: React.FC<ItemProps> = ({
           </div>
         </React.Fragment>
       ) : (
-        <React.Fragment>
-          <H5 style={{ marginLeft: "1rem", marginTop: "5px" }}>{param.name}</H5>
-          <div style={{ display: "flex" }}>
-            <H5 style={{ marginRight: "1rem", marginTop: "5px" }}>
-              {param.val}
-            </H5>
-          </div>
-        </React.Fragment>
-      )}
+          <React.Fragment>
+            <H5 style={{ marginLeft: "1rem", marginTop: "5px" }}>{param.name}</H5>
+            <div style={{ display: "flex" }}>
+              <H5 style={{ marginRight: "1rem", marginTop: "5px" }}>
+                {param.val}
+              </H5>
+            </div>
+          </React.Fragment>
+        )}
     </div>
   );
 };
 
-const Content = () => (
-  <Callout
-    style={{
-      display: "flex",
-      alignItems: "baseline",
-      alignContent: "center",
-      height: "100%",
-      justifyContent: "space-between"
-    }}
-  >
-    <div style={{ display: "flex", marginLeft: "10%" }}>
-      <Info a="Path: " b={"PATHOO"} />
-      <Divider />
-      <Info a="Type: " b="valval" />
-      <Divider />
-      <Info a="Status:" b="Normal" />
-      <Divider />
-      <Info a="Value: " b="VALVALLVA" />
-    </div>
-    <div>
-      <input
-        className={Classes.INPUT}
-        type="text"
-        placeholder="New Value"
-        dir="auto"
-      />
-    </div>
-  </Callout>
-);
+
 // Hook
 function usePrevious(value) {
   // The ref object is a generic container whose current property is mutable ...

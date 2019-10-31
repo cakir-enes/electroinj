@@ -6,33 +6,37 @@ import { ipcMain } from "electron";
 export const initHandlers = () => {
   NatsClient.createNew()
     .then(nc => {
+
       ipcMain.on(REQ.AllParamInfo, (event, arg) => {
         console.log("AllParamInfo received");
-        event.reply(REQ.AllParamInfo, modParams);
+        nc.allParameterInfo().then(info => event.reply(REQ.AllParamInfo, info))
       });
 
       let tok: NodeJS.Timeout | null = null;
       ipcMain.on(REQ.SUBSCRIBE_PARAMS, (event, p, freq) => {
         console.log(`SUB PARAMS: ${JSON.stringify(p)}`);
-        tok = setInterval(() => {
-          let newVals = Object.entries(p)
-            .map(([mod, params]: [string, string[]]) =>
-              params.map(param => ({
-                name: `${mod}.${param}`,
-                val: Math.random().toFixed(3)
-              }))
-            )
-            .flat();
-          //   let a = params.map(v => ({
-          //     ...v,
-          //     val: Math.random()
-          //       .toFixed(3)
-          //       .toString()
-          //   }));
-          event.reply(REQ.SUBSCRIBE_PARAMS, newVals);
-        }, freq);
+        // tok = setInterval(() => {
+        //   let newVals = Object.entries(p)
+        //     .map(([mod, params]: [string, string[]]) =>
+        //       params.map(param => ({
+        //         name: `${mod}.${param}`,
+        //         val: Math.random().toFixed(3),
+        //         type: "str"
+        //       }))
+        //     )
+        //     .flat();
+        //   event.reply(REQ.SUBSCRIBE_PARAMS, newVals);
+        // }, freq)
+        tok = setInterval(() => nc.multiGet(p).then(), freq)
       });
+
+
       ipcMain.on(REQ.UNSUB_PARAMS, (e, a) => clearInterval(tok));
+
+      ipcMain.on(REQ.SET, (e, paramName, newVal) => {
+        console.log(`SENDING SET REQ NewVal: ${paramName} -> ${newVal}`)
+        nc.multiSet([{ path: paramName, val: newVal }])
+      })
     })
     .catch(err => console.error(err));
 };
