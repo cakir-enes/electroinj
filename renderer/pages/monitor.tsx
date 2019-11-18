@@ -7,6 +7,7 @@ import { REQ } from "../../shared/rpc";
 const Monitor = () => {
   let { selections } = useContext(SelectedPathsContext);
   const params = useParameters(selections);
+  // useEffect(() => console.log(`New params: ${params}`), [params])
   return <MonitorList params={params} />;
 };
 

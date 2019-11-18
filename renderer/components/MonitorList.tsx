@@ -19,13 +19,17 @@ type Props = { params: Parameter[] };
 
 const MonitorList: React.FC<Props> = ({ params }) => {
   const [open, setOpen] = useState(false);
+
   const paramRef = useRef(0);
   return (
-    <React.Fragment>
-      <Virtuoso
-        style={{ flexGrow: 1, height: "100%" }}
-        totalCount={params.length}
-        item={idx => (
+    // <H5>{JSON.stringify(params)}</H5>
+    // <Virtuoso style={{ width: '200px', height: '400px' }} totalCount={params.length} item={index => <H5>{JSON.stringify(params[index])}</H5>} />
+    <Virtuoso
+      // style={{ flexGrow: 1, height: "100%" }}
+      style={{ width: "800px", height: "900px", flexGrow: 1 }}
+      totalCount={params.length}
+      item={idx =>
+        (
           <Item
             param={params[idx]}
             onClick={param => {
@@ -41,8 +45,8 @@ const MonitorList: React.FC<Props> = ({ params }) => {
             }}
           />
         )}
-      />
-    </React.Fragment>
+    />
+
   );
 };
 

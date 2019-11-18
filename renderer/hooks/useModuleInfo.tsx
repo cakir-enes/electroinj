@@ -30,7 +30,7 @@ export const useModuleInfo: () => ModInfoMap = () => {
   return modInfo;
 };
 
-export const useModInfoTree: (
+export const  useModInfoTree: (
   modInfo: ModInfoMap
 ) => Node<string>[] = modInfo => {
   let [tree, setTree] = useState([]);

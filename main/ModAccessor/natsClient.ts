@@ -1,9 +1,9 @@
-import {Client, connect, Msg, Payload} from 'ts-nats';
+import { Client, connect, Msg, Payload } from 'ts-nats';
 
-import {ModInfo, ModInfoMap, NewValsMap, PathVal} from '../../shared/types';
-import {reflect, Status} from '../helpers';
+import { ModInfo, ModInfoMap, NewValsMap, PathVal } from '../../shared/types';
+import { reflect, Status } from '../helpers';
 
-import {IAccessor} from './IAccessor';
+import { IAccessor } from './IAccessor';
 
 const mods = ['FTE', 'ESM'];
 
@@ -13,13 +13,13 @@ class NatsClient implements IAccessor {
 
   static async createNew(): Promise<NatsClient> {
     return new Promise<NatsClient>((res, rej) => {
-      connect({payload: Payload.JSON})
-          .then(conn => {
-            let nc = new NatsClient();
-            nc.client = conn;
-            res(nc);
-          })
-          .catch(err => rej(err));
+      connect({ payload: Payload.JSON })
+        .then(conn => {
+          let nc = new NatsClient();
+          nc.client = conn;
+          res(nc);
+        })
+        .catch(err => rej(err));
     });
   }
 
@@ -29,27 +29,27 @@ class NatsClient implements IAccessor {
     Object.keys(map).forEach(v => {
       console.log(`Sending request to ${v}.MULTI_SET -> ${map[v]}`);
       this.client.request(`${v}.MULTI_SET`, 500, map[v])
-          .catch(err => console.error(`COULDNT MULTI_SET values: ${err}`));
+        .catch(err => console.error(`COULDNT MULTI_SET values: ${err}`));
     });
   }
 
   async allParameterInfo(): Promise<ModInfoMap> {
     let info = <ModInfoMap>{};
     await Promise
-        .all(mods.map(m => reflect<Msg>(this.client.request(`${m}.DISCOVER`))))
-        .then(
-            results =>
-                mods.map<[string, Status<Msg>]>((m, i) => [m, results[i]]))
-        .then(msgs => msgs.forEach(([mod, msg]) => {
-          if (msg.resolved) {
-            info[mod] = <ModInfo>{};
-            info[mod].enums = msg.payload.data.enums;
-            info[mod].params = msg.payload.data.params;
-          } else {
-            console.error(`Couldnt fetch param infos of ${mod}`);
-          }
-        }))
-        .catch(err => console.error(`Error Fetcing ParamInfos: ${err}`));
+      .all(mods.map(m => reflect<Msg>(this.client.request(`${m}.DISCOVER`))))
+      .then(
+        results =>
+          mods.map<[string, Status<Msg>]>((m, i) => [m, results[i]]))
+      .then(msgs => msgs.forEach(([mod, msg]) => {
+        if (msg.resolved) {
+          info[mod] = <ModInfo>{};
+          info[mod].enums = msg.payload.data.enums;
+          info[mod].params = msg.payload.data.params;
+        } else {
+          console.error(`Couldnt fetch param infos of ${mod}`);
+        }
+      }))
+      .catch(err => console.error(`Error Fetcing ParamInfos: ${err}`));
     return new Promise(res => {
       res(info);
     });
@@ -60,23 +60,23 @@ class NatsClient implements IAccessor {
     let ans = <NewValsMap>{};
     console.log(`MULTI_GET_REQ: ${JSON.stringify(map)}`);
     return new Promise(
-        res => Promise
-                   .all(Object.keys(map).map(
-                       m => reflect<Msg>(
-                           this.client.request(`${m}.MULTI_GET`, 500, map[m]))))
-                   .then(
-                       results => Object.keys(map).map<[string, Status<Msg>]>(
-                           (m, i) => [m, results[i]]))
-                   .then(
-                       msgs => msgs.forEach(
-                           ([mod, msg]) => msg.resolved ?
-                               (ans[mod] = msg.payload.data) :
-                               console.error(`COULDNT FETCH VALUES OF ${mod}`)))
-                   .then(() => res(ans)));
+      res => Promise
+        .all(Object.keys(map).map(
+          m => reflect<Msg>(
+            this.client.request(`${m}.MULTI_GET`, 500, map[m]))))
+        .then(
+          results => Object.keys(map).map<[string, Status<Msg>]>(
+            (m, i) => [m, results[i]]))
+        .then(
+          msgs => msgs.forEach(
+            ([mod, msg]) => msg.resolved ?
+              (ans[mod] = msg.payload.data) :
+              console.error(`COULDNT FETCH VALUES OF ${mod}`)))
+        .then(() => res(ans)));
   }
 
-  private groupByMods<T extends {path: string}>(paths: T[]|
-                                                string[]): Map<string, T[]> {
+  private groupByMods<T extends { path: string }>(paths: T[] |
+    string[]): Map<string, T[]> {
     let map = new Map<string, T[]>();
     paths.forEach(p => {
       const isString = typeof p === 'string';
@@ -84,7 +84,7 @@ class NatsClient implements IAccessor {
 
       const idx = path.indexOf('.');
       const mod = path.substr(0, idx);
-      p = isString ? path.substr(idx + 1) : {...p, path: path.substr(idx + 1)};
+      p = isString ? path.substr(idx + 1) : { ...p, path: path.substr(idx + 1) };
       if (map[mod])
         map[mod].push(p);
       else

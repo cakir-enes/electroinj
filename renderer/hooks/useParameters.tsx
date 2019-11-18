@@ -11,6 +11,7 @@ export const useParameters = (reqParams: ModParams) => {
   const [params, setParams] = useState<Parameter[]>([]);
   useEffect(() => {
     const handler = (_, arg) => {
+      // console.log(`NEW ARG RECV: ${JSON.stringify(arg)}`)
       setParams(arg);
     };
     ipcRenderer.on(REQ.SUBSCRIBE_PARAMS, handler);

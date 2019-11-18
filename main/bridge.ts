@@ -14,20 +14,22 @@ export const initHandlers = () => {
 
       let tok: NodeJS.Timeout | null = null;
       ipcMain.on(REQ.SUBSCRIBE_PARAMS, (event, p, freq) => {
-        console.log(`SUB PARAMS: ${JSON.stringify(p)}`);
-        // tok = setInterval(() => {
-        //   let newVals = Object.entries(p)
-        //     .map(([mod, params]: [string, string[]]) =>
-        //       params.map(param => ({
-        //         name: `${mod}.${param}`,
-        //         val: Math.random().toFixed(3),
-        //         type: "str"
-        //       }))
-        //     )
-        //     .flat();
-        //   event.reply(REQ.SUBSCRIBE_PARAMS, newVals);
-        // }, freq)
-        tok = setInterval(() => nc.multiGet(p).then(), freq)
+        console.log(`SUB PARAMS: ${JSON.stringify(p)} p: ${JSON.stringify(p)} Freq: ${freq}`);
+        tok = setInterval(() => {
+          let newVals = Object.entries(p)
+            .map(([mod, params]: [string, string[]]) =>
+              params.map(param => ({
+                name: `${mod}.${param}`,
+                val: Math.random().toFixed(3),
+                type: "str"
+              }))
+            )
+            .flat();
+          // console.log(newVals)
+          params.forEach(p => (p.val = Math.random().toFixed(3)))
+          event.reply(REQ.SUBSCRIBE_PARAMS, params);
+        }, freq)
+        // tok = setInterval(() => nc.multiGet(p).then(), freq)
       });
 
 
